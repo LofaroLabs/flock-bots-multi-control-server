@@ -34,6 +34,7 @@
 
 
 
+
 /* ach_channel IDs */
 ach_channel_t chan_flock_bots_ref; // flockbots reference channel 
 
@@ -61,22 +62,25 @@ int main(int argc, char **argv) {
 
 
   /* Create Ach Channel */
+  struct flock_bots_ref F_ref;
+  memset( &F_ref, 0, sizeof(F_ref));
 
-  enum ach_status r = ach_create( FLOCK_BOTS_CHAN_REF_NAME, 10, 512, NULL );
-  if( ACH_OK != r ) {
-    fprintf( stderr, "Channel Status: %s\n", ach_result_to_string(r) );
-    if(ACH_EEXIST != r){
+  enum ach_status r0 = ach_create( FLOCK_BOTS_CHAN_REF_NAME, 10, 512, NULL );
+  if( ACH_OK != r0 ) {
+    fprintf( stderr, "Channel Status: %s\n", ach_result_to_string(r0) );
+    if(ACH_EEXIST != r0){
       exit(EXIT_FAILURE);
     }
   }
 
   /* Open Ach Channel */
-  r = ach_open(&chan_flock_bots_ref, FLOCK_BOTS_CHAN_REF_NAME , NULL);
+  enum ach_status r = ach_open(&chan_flock_bots_ref, FLOCK_BOTS_CHAN_REF_NAME , NULL);
   assert( ACH_OK == r );
 
-  struct flock_bots_ref F_ref;
-  memset( &F_ref, 0, sizeof(F_ref));
 
+  /* Reset the Channel */
+   /* Write to the feed-forward channel */
+   ach_put( &chan_flock_bots_ref, &F_ref, sizeof(F_ref));
 
 
   /* 
@@ -147,7 +151,48 @@ int main(int argc, char **argv) {
     printf("server received datagram from %s (%s)\n", 
 	   hostp->h_name, hostaddrp);
     printf("server received %d/%d bytes: %s\n", (int)strlen(buf), (int)n, buf);
+   
+
+
+    /* Split buffer */
+    char * pch;
+    pch = strtok (buf," ");
+    while (pch != NULL)
+    {
+      printf ("%s\n",pch);
+      
+      /* Compare */
+      char* lhs = "joy";
+      int rc = strcmp(lhs, pch);
+      if(rc == 0){
+        printf("-------joy------\n");
+        pch = strtok (NULL, " ");
+      /* Joy Stick */
+        while (pch != NULL){
+          char* joy_right = "right";
+          int rc_joy_right = strcmp(joy_right, pch);
+          if(rc_joy_right == 0){
+            printf("-------right------\n");
+            pch = strtok (NULL, " ");
+            int i = 0;
+            while (pch != NULL){
+              F_ref.ref[i] = atof(pch);
+              i++;
+              pch = strtok (NULL, " ");
+              if( i == 2 ){
+                ach_put( &chan_flock_bots_ref, &F_ref, sizeof(F_ref));
+              }
+            }
+          pch = strtok (NULL, " ");
+          }
+        }
+      }
+      pch = strtok (NULL, " ");
+    }
     
+    printf("ach chan = %f , %f\n", F_ref.ref[0],F_ref.ref[1]);
+
+ 
     /* 
      * sendto: echo the input back to the client 
      */

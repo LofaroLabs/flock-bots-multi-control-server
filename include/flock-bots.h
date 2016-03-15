@@ -14,5 +14,5 @@
 #define  WHEEL_RIGHT 1 	//> right wheel
 
 typedef struct flock_bots_ref {
-  double refi[2]; 		//< reference or let and righ wheel
+  double ref[2]; 		//< reference or let and righ wheel
 }__attribute__((packed)) flock_bots_ref_t;
