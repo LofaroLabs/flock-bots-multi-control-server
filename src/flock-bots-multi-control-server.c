@@ -143,6 +143,8 @@ int main(int argc, char **argv) {
      */
     hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, 
 			  sizeof(clientaddr.sin_addr.s_addr), AF_INET);
+
+/*
     if (hostp == NULL)
       error("ERROR on gethostbyaddr");
     hostaddrp = inet_ntoa(clientaddr.sin_addr);
@@ -151,7 +153,7 @@ int main(int argc, char **argv) {
     printf("server received datagram from %s (%s)\n", 
 	   hostp->h_name, hostaddrp);
     printf("server received %d/%d bytes: %s\n", (int)strlen(buf), (int)n, buf);
-   
+  */ 
 
 
     /* Split buffer */
@@ -183,8 +185,9 @@ int main(int argc, char **argv) {
                 ach_put( &chan_flock_bots_ref, &F_ref, sizeof(F_ref));
               }
             }
-          pch = strtok (NULL, " ");
+            pch = strtok (NULL, " ");
           }
+          pch = strtok (NULL, " ");
         }
       }
       pch = strtok (NULL, " ");
