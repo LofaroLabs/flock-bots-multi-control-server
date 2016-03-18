@@ -44,27 +44,11 @@ int8_t* getWheels(double x, double y){
 
 
   int8_t* c = malloc(sizeof(int8_t)*2);
-  c[0] = 0;
-  c[1] = 0;
+  double l = y + x;
+  double r = y - x;
 
-
-  double xx = 100.0*x;
-  double yy = 100.0*y;
-  double v = (100.0-abs(xx))*(yy/100.0)+yy;
-  double w = (100.0-abs(yy))*(xx/100.0)+xx;
-  double r = (v+w)/2.0;
-  double l = (v-w)/2.0;
-
-  if (r > 100.0)  r =  100.0;
-  if (r < -100.0) r = -100.0;
-  if (l > 100.0)  l =  100.0;
-  if (l < -100.0) l = -100.0;
-
-  c[0] = (int8_t)l;
-  c[1] = (int8_t)r;
-
-//  double a = atan2(y,x);
-//  double h = sqrt(x*x + y*y);
+  c[0] = (int8_t)(l*50.0);
+  c[1] = (int8_t)(r*50.0);
 
 
   return c;
@@ -150,11 +134,14 @@ int main(int argc, char **argv) {
       buf[1] = 'D';
       buf[2] = 'M';
       buf[3] = 'W';
-      memset( &buf[4], &c[0], sizeof(int8_t));
-      memset( &buf[5], &c[1], sizeof(int8_t));
+      buf[4] = c[0];
+      buf[5] = c[1];
+//      memset( &buf[4], &c[0], sizeof(int8_t));
+//      memset( &buf[5], &c[1], sizeof(int8_t));
 
 
-      n = write(sockfd, buf, strlen(buf));
+      //n = write(sockfd, buf, strlen(buf));
+      n = write(sockfd, buf, sizeof(int8_t)*6);
       if (n < 0) 
         error("ERROR writing to socket");
         connect(sockfd, &serveraddr, sizeof(serveraddr));
